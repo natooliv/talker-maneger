@@ -17,3 +17,4 @@ USER node
 
 # Substitui o comando padrão da imagem do node
 CMD [ "/bin/bash" ]
+# //
