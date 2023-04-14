@@ -1,7 +1,4 @@
-
 const VALIDADE_EMAIL = (req, res, next) => {
-
-
   const { email } = req.body;
   
   if (!email) {
@@ -20,7 +17,7 @@ const VALIDADE_EMAIL = (req, res, next) => {
 };
 
 const VALIDADE_SENHA = (req, res, next) => {
-  const { password} = req.body;
+  const { password } = req.body;
 
   if (!password || password.trim() === '') {
     return res.status(400)
