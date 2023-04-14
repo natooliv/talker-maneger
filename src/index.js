@@ -9,7 +9,6 @@ app.use(bodyParser.json());
 
 const HTTP_OK_STATUS = 200;
 const PORT = process.env.PORT || '3001';
-const HTTP_DELETED_STATUS = 204;
 
 // não remova esse endpoint, e para o avaliador funcionar
 app.get('/', (_request, response) => {
@@ -30,16 +29,14 @@ app.get('/talker', async (_req, _res) => {
   return _res.status(HTTP_OK_STATUS).json(talkers);
 });
 
-// Crie o endpoint GET /talker/:id
 // A requisição deve retornar o status 200 e uma pessoa palestrante com base no id da rota.
  app.get('/talker/:id', async (req, res) => {
   const talkers = await handleUser();
   const { id } = req.params;
-  const talker = talkers.find((talker) => talker.id === Number(id));
-  if (!talker) return res.status(404).json({ message: 'Pessoa palestrante não encontrada', });
-  return res.status(HTTP_OK_STATUS).json(talker);
+  const talkerss = talkers.find((talker) => talker.id === Number(id));
+  if (!talkerss) return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
+  return res.status(HTTP_OK_STATUS).json(talkerss);
 });
-
 
 app.listen(PORT, () => {
   console.log('Online');
