@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const requisicao = require('fs').promises;
 const { join } = require('path');
+const crypto = require('crypto');
 
 const app = express();
 app.use(express.json());
@@ -33,11 +34,18 @@ app.get('/talker', async (_req, _res) => {
  app.get('/talker/:id', async (req, res) => {
   const talkers = await handleUser();
   const { id } = req.params;
-  const talkerss = talkers.find((talker) => talker.id === Number(id));
-  if (!talkerss) return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
-  return res.status(HTTP_OK_STATUS).json(talkerss);
+  const talker = talkers.find((e) => e.id === Number(id));
+  if (!talker) return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
+  return res.status(HTTP_OK_STATUS).json(talker);
 });
 
 app.listen(PORT, () => {
   console.log('Online');
+});
+
+// O endpoint deverá receber no corpo da requisição os campos email e password e retornar um token aleatório de 16 caracteres
+app.post('/login', (_req, res) => {
+  const tokens = crypto.randomBytes(8).toString('hex');
+  const response = { token: tokens };
+  res.status(HTTP_OK_STATUS).json(response);
 });
