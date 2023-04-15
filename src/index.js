@@ -56,6 +56,7 @@ app.listen(PORT, () => {
 // O endpoint deverá receber no corpo da requisição os campos email e password e retornar um token aleatório de 16 caracteres
 app.post('/login', VALIDADE_EMAIL, VALIDADE_SENHA, (_req, res) => {
   const tokens = crypto.randomBytes(8).toString('hex');
+  console.log(tokens);
   const response = { token: tokens };
   res.status(HTTP_OK_STATUS).json(response);
 });
@@ -66,4 +67,27 @@ app.post('/talker', validandoToken, validandoNome,
   const { name, age, talk } = req.body;
   const adcionando = await novoUsuario(name, age, talk);
   res.status(201).json(adcionando);
+});
+
+// O endpoint deverá receber no corpo da requisição os campos name, age e talk e atualizar a pessoa palestrante com o id informado na rota.
+const atualizacaoUsuario= async (id, body) => {
+  const {name,age,talk} = body;
+  const talkers = await handleUser();
+  let talker = talkers.find((usuario) => usuario.id === Number(usuario));
+  const removerTalker = talkers.filter((usuario) => usuario.id !== Number(usuario));
+  talker = { name, age, id:Number(id), talk };
+  const atualizar = [...removerTalker, talker];
+  await requisicao.writeFile(talkersPath, JSON.stringify(atualizar));
+  // Será validado que o endpoint retorna um erro caso nenhuma pessoa palestrante seja encontrada (23 ms) com erro 400 json
+
+  return talker;
+};
+ app.put ('/talker/:id', validandoToken, validandoNome, validandoIdadeUsuario, validandoTalk, validandoDate, validandoRate, async (req, res) => {
+  const { id } = req.params;
+ const {body} = req;
+  const atualizar = await atualizacaoUsuario(id, body);
+  res.status(200).json(atualizar);
+  // Será validado que o endpoint retorna um erro caso nenhuma pessoa palestrante seja encontrada 
+  if (!atualizar) return res.status(400).json({ message: 'Pessoa palestrante não encontrada' });
+
 });
