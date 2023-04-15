@@ -70,24 +70,42 @@ app.post('/talker', validandoToken, validandoNome,
 });
 
 // O endpoint deverá receber no corpo da requisição os campos name, age e talk e atualizar a pessoa palestrante com o id informado na rota.
-const atualizacaoUsuario= async (id, body) => {
-  const {name,age,talk} = body;
+const atualizacaoUsuario = async (id, body) => {
+  const { name, age, talk } = body;
   const talkers = await handleUser();
   let talker = talkers.find((usuario) => usuario.id === Number(usuario));
   const removerTalker = talkers.filter((usuario) => usuario.id !== Number(usuario));
-  talker = { name, age, id:Number(id), talk };
+  talker = { name, age, id: Number(id), talk };
   const atualizar = [...removerTalker, talker];
   await requisicao.writeFile(talkersPath, JSON.stringify(atualizar));
-  // Será validado que o endpoint retorna um erro caso nenhuma pessoa palestrante seja encontrada (23 ms) com erro 400 json
 
   return talker;
 };
- app.put ('/talker/:id', validandoToken, validandoNome, validandoIdadeUsuario, validandoTalk, validandoDate, validandoRate, async (req, res) => {
+ app.put('/talker/:id', validandoToken, validandoNome, 
+ validandoIdadeUsuario, validandoTalk, 
+ validandoDate, validandoRate, async (req, res) => {
   const { id } = req.params;
- const {body} = req;
+ const { body } = req;
   const atualizar = await atualizacaoUsuario(id, body);
   res.status(200).json(atualizar);
-  // Será validado que o endpoint retorna um erro caso nenhuma pessoa palestrante seja encontrada 
   if (!atualizar) return res.status(400).json({ message: 'Pessoa palestrante não encontrada' });
-
+});
+// O endpoint deverá deletar a pessoa palestrante com o id informado na rota.
+// A requisição deve ter o token de autenticação nos headers, no campo authorization.
+const deletarUsuario = async (id) => {
+  const talkers = await handleUser();
+  const removerTalker = talkers.filter((usuario) => usuario.id !== Number(id));
+  await requisicao.writeFile(talkersPath, JSON.stringify(removerTalker));
+  return removerTalker;
+};
+const validandoId = async (req, res, next) => {
+  const token = req.headers.authorization;
+  if (!token) return res.status(401).json({ message: 'Token não encontrado' });
+  if (token.length !== 16) return res.status(401).json({ message: 'Token inválido' });
+  next();
+};
+app.delete('/talker/:id', validandoId, async (req, res) => {
+  const { id } = req.params;
+  await deletarUsuario(id);
+  return res.status(204).json();
 });
