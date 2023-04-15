@@ -70,25 +70,32 @@ app.post('/talker', validandoToken, validandoNome,
 });
 
 // O endpoint deverá receber no corpo da requisição os campos name, age e talk e atualizar a pessoa palestrante com o id informado na rota.
-const atualizacaoUsuario = async (id, body) => {
-  const { name, age, talk } = body;
-  const talkers = await handleUser();
-  let talker = talkers.find((usuario) => usuario.id === Number(usuario));
-  const removerTalker = talkers.filter((usuario) => usuario.id !== Number(usuario));
-  talker = { name, age, id: Number(id), talk };
-  const atualizar = [...removerTalker, talker];
-  await requisicao.writeFile(talkersPath, JSON.stringify(atualizar));
+// const atualizacaoUsuario = async (id, body) => {
+//   const { name, age, talk } = body;
+//   const talkers = await handleUser();
+//   let talker = talkers.some((usuario) => usuario.id === Number(id));
+//   const removerTalker = talkers.findIndex((usuario) => usuario.id === Number(id));
+//   talkers[removerTalker] = { name, age, id: Number(id), talk };
+//   await requisicao.writeFile(talkersPath, JSON.stringify(talkers));
 
-  return talker;
-};
+//   return talker;
+// };
+
  app.put('/talker/:id', validandoToken, validandoNome, 
  validandoIdadeUsuario, validandoTalk, 
  validandoDate, validandoRate, async (req, res) => {
+  const { name, age, talk } = req.body;
+  const talkers = await handleUser();
   const { id } = req.params;
- const { body } = req;
-  const atualizar = await atualizacaoUsuario(id, body);
-  res.status(200).json(atualizar);
-  if (!atualizar) return res.status(400).json({ message: 'Pessoa palestrante não encontrada' });
+  const talker = talkers.some((usuario) => usuario.id === Number(id));
+  const removerTalker = talkers.findIndex((usuario) => usuario.id === Number(id));
+  talkers[removerTalker] = { name, age, id: Number(id), talk };
+  if (!talker) {
+ return res.status(404)
+  .json({ message: 'Pessoa palestrante não encontrada' }); 
+}
+  await requisicao.writeFile(talkersPath, JSON.stringify(talkers));
+ return res.status(200).json(talkers[removerTalker]);
 });
 // O endpoint deverá deletar a pessoa palestrante com o id informado na rota.
 // A requisição deve ter o token de autenticação nos headers, no campo authorization.
