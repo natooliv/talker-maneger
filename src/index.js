@@ -63,7 +63,7 @@ app.post('/login', VALIDADE_EMAIL, VALIDADE_SENHA, (_req, res) => {
 app.post('/talker', validandoToken, validandoNome,
  validandoIdadeUsuario, validandoTalk, 
  validandoDate, validandoRate, async (req, res) => {
-  const { name, age, talk, watchedAt, rate } = req.body;
-  const adcionando = await novoUsuario(name, age, talk, watchedAt, rate);
+  const { name, age, talk } = req.body;
+  const adcionando = await novoUsuario(name, age, talk);
   res.status(201).json(adcionando);
 });

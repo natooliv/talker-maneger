@@ -1,11 +1,14 @@
 const { writeFile } = require('fs').promises;
-const path = require('path');
+const { join } = require('path');
+const requisicao = require('fs').promises;
 
-const usersDb = path.resolve(__dirname, '..', 'talker.json');
-const { handleUser } = require('../index');
+const talkerPath = './talker.json';
+const talkersPath = join('/app/src', talkerPath);
 
 const novoUsuario = async (name, age, talk) => {
-  const users = await handleUser();
+  const talkers = await requisicao.readFile(talkersPath, 'utf-8');
+  const users = await JSON.parse(talkers);
+
   const id = Number(users[users.length - 1].id) + 1;
   users.push({
     name,
@@ -14,8 +17,8 @@ const novoUsuario = async (name, age, talk) => {
     talk,
   });
 
-  await writeFile(usersDb, JSON.stringify(users, null, 2));
-  return { name, age, id, talk };
+  await writeFile(talkersPath, JSON.stringify(users));
+  return ({ id, name, age, talk });
 };
 
 const validandoToken = (req, res, next) => {
@@ -77,6 +80,17 @@ const validandoDate = (req, res, next) => {
   }
   return next();
 };
+ const validandoRate = (req, res, next) => {
+const { talk: { rate } } = req.body;
+   if (rate === undefined) {
+    return res.status(400).json({ message: 'O campo "rate" é obrigatório' }); 
+  }
+  if (rate <= 0 || rate > 5 || !Number.isInteger(rate)) {
+   return res.status(400)
+   .json({ message: 'O campo "rate" deve ser um número inteiro entre 1 e 5' });
+  }
+   next();
+};
 
   module.exports = {
     novoUsuario,
@@ -85,5 +99,6 @@ const validandoDate = (req, res, next) => {
     validandoIdadeUsuario,
     validandoTalk,
     validandoDate,
-    // validandoRate,
+    validandoRate,
+    
   };
