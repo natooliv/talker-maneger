@@ -9,7 +9,7 @@ const novoUsuario = async (name, age, talk) => {
   const talkers = await requisicao.readFile(talkersPath, 'utf-8');
   const users = await JSON.parse(talkers);
 
-  const id = Number(users[users.length - 1].id) + 1;
+  const id = users[users.length - 1].id + 1;
   users.push({
     name,
     age,
