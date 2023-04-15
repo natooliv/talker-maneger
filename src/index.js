@@ -56,9 +56,8 @@ app.listen(PORT, () => {
 // O endpoint deverá receber no corpo da requisição os campos email e password e retornar um token aleatório de 16 caracteres
 app.post('/login', VALIDADE_EMAIL, VALIDADE_SENHA, (_req, res) => {
   const tokens = crypto.randomBytes(8).toString('hex');
-  console.log(tokens);
   const response = { token: tokens };
-  res.status(HTTP_OK_STATUS).json(response);
+  res.status(200).json(response);
 });
 
 app.post('/talker', validandoToken, validandoNome,
