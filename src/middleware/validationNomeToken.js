@@ -2,11 +2,14 @@ const { writeFile } = require('fs').promises;
 const { join } = require('path');
 const requisicao = require('fs').promises;
 
-const talkerPath = './talker.json';
-const talkersPath = join('/app/src', talkerPath);
+
+// const talkersPath = join('/app/src', talkerPath);
+const { resolve } = require('path');
+
+const talkerPath = resolve(__dirname, '..', 'talker.json');
 
 const novoUsuario = async (name, age, talk) => {
-  const talkers = await requisicao.readFile(talkersPath, 'utf-8');
+  const talkers = await requisicao.readFile(talkerPath, 'utf-8');
   const users = await JSON.parse(talkers);
 
   const id = users[users.length - 1].id + 1;
@@ -17,7 +20,7 @@ const novoUsuario = async (name, age, talk) => {
     talk,
   });
 
-  await writeFile(talkersPath, JSON.stringify(users));
+  await writeFile(talkerPath, JSON.stringify(users));
   return ({ id, name, age, talk });
 };
 
