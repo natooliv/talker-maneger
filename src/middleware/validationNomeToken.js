@@ -1,7 +1,5 @@
 const { writeFile } = require('fs').promises;
-const { join } = require('path');
 const requisicao = require('fs').promises;
-
 
 // const talkersPath = join('/app/src', talkerPath);
 const { resolve } = require('path');
